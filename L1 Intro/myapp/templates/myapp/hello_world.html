@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+
+</head>
+<body>
+{% if method == 'POST' %}
+<h1>Hello, {{ name }}!</h1>
+{% else %}
+<h1>Hello, world!</h1>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <label for="name">Имя</label>
+    <input type="text" placeholder="Insert your name" id="name" name="name">
+    <input type="submit" value="Отправить">
+</form>
+<div>
+    {{ request }}
+</div>
+</body>
+</html>

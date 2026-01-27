@@ -1,0 +1,71 @@
+* {
+    margin: 10;
+    padding: 10;
+}
+
+body {
+    font-family: 'Rubic Storm', sans-serif;
+    background: #a3fd1d;
+    background: linear-gradient(90deg,
+    rgba(163, 253, 29, 1) 20%,
+    rgba(29, 246, 253, 1) 50%,
+    rgba(164, 50, 252, 1) 76%,
+    rgba(252, 69, 112, 1) 100%);}
+}
+a:visited {
+  color: pink;
+  background-color: white;
+
+}
+
+h3.red-text {
+    color: red;
+    font-size: 20px;
+}
+
+h3, h2 {
+    color: green;
+    background-color: yellow;
+}
+
+#unique {
+    color: blue;
+}
+
+.card {
+    border: 3px groove #ccc;
+    padding: 20px;
+    margin: 30px;
+    background-color: #f9f9f9;
+    width: 300px;
+}
+
+.card:hover {
+    background-color: grey;
+}
+
+p:hover::selection {
+    background-color: green;
+    color: navy;
+}
+
+input:focus {
+    background-color: green !important;
+}
+
+[type="text"] {
+    color: red;
+}
+
+/* General site styles */
+a {
+  color: blue;
+}
+
+footer {
+  background-color: #333;
+  color: white;
+}
+footer a {
+  color: inherit;
+}

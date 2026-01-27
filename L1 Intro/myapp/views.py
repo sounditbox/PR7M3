@@ -8,4 +8,4 @@ def hello_world(request: HttpRequest):
         print(request.POST)
         context['name'] = request.POST['name']
 
-    return render(request, 'hello_world.html', context=context)
+    return render(request, 'myapp/hello_world.html', context=context)
