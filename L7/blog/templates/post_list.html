@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post List</title>
+</head>
+<body>
+<h1>Post List</h1>
+<a href="{% url 'blog:add_post' %}"><button>Add Post</button></a>
+{% for p in posts %}
+    <a href="{% url 'blog:post_detail' p.id %}"><h3>{{ p.title }}</h3></a>
+    <p>{{ p.content }}</p>
+    <p>{{ p.created_at }}</p>
+{% endfor %}
+</body>
+</html>
