@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple View</title>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Message">
+        <input type="submit" value="Send">
+    </form>
+    <h1>Simple View</h1>
+    <p>Message: {{ message }}</p>
+    <p>Method: {{ method }}</p>
+</body>
+</html>
