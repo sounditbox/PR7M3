@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post List</title>
+</head>
+<body>
+<h1>Post List</h1>
+<div>
+    <h2>Stats</h2>
+    {% for k, v in stats.items %}
+        <p>{{ k }} : {{ v }}</p>
+    {% endfor %}
+</div>
+<a href="{% url 'blog:add_post' %}">
+    <button>Add Post</button>
+</a>
+{% for p in posts %}
+<div>
+    <a href="{% url 'blog:post_detail' p.id %}"><h3>{{ p.title }}</h3></a>
+    <p>{{ p.content }}</p>
+    <p>Comments: {{ p.comments_count }}</p>
+    <p>👀: {{ p.views }}</p>
+    <p>{{ p.created_at }}</p>
+</div>
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+        <span class="current">
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">последняя »</a>
+        {% endif %}
+    </span>
+</div>
+</body>
+</html>
