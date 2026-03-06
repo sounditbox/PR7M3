@@ -40,6 +40,14 @@
             </div>
 
             <div class="vstack gap-3">
+            <form method="post" action="{% url 'blog:comment_create' post.pk %}" novalidate>
+                {% csrf_token %}
+                {% include "includes/_form_fields.html" %}
+                <div class="d-flex flex-wrap gap-2 pt-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Комментировать</button>
+                </div>
+            </form>
+
                 {% for comment in post.comments.all %}
                     <div class="card border-0 bg-light-subtle rounded-4">
                         <div class="card-body p-4">

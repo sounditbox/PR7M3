@@ -3,10 +3,11 @@ import logging
 from django.db.models import F
 from django.db.models.aggregates import Count
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
-from .forms import FeedbackForm, PostForm, ExampleForm, StyledForm
+from .forms import FeedbackForm, PostForm, ExampleForm, StyledForm, CommentForm
 from .models import Post
 
 logging.basicConfig(
@@ -47,19 +48,30 @@ class PostDetailView(DetailView):
         post.save(update_fields=['views'])
         return super().get(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        return context
+
 
 class PostCreateView(CreateView):
     model = Post
+    form_class = PostForm
     template_name = 'post_create_update.html'
-    fields = ['title', 'content']
+    # fields = ['title', 'content', 'tags', 'published']
     extra_context = {'title': 'Create Post'}
     success_url = reverse_lazy('blog:post_list')
+
+    # def form_valid(self, form):
+    #     post = form.save(commit=False)
+    #     post.author = request.user.author
+    #     post.save()
 
 
 class PostUpdateView(UpdateView):
     model = Post
     template_name = 'post_create_update.html'
-    fields = ['title', 'content']
+    fields = ['title', 'content', 'tags', 'published']
     extra_context = {'title': 'Update Post'}
     success_url = reverse_lazy('blog:post_list')
 
@@ -86,10 +98,21 @@ def create_post(request):
         return render(request, 'post_create_update.html', context={'form': form, 'title': 'Create Post'})
     form = PostForm(request.POST)
     if form.is_valid():
-        post = Post(**form.cleaned_data)
+        post = form.save(commit=False)
         post.author = request.user.author
         post.save()
-        return redirect('blog:post_list')
+        return redirect('blog:post_detail', post_id=post.pk)
     else:
         return render(request, 'post_create_update.html', context={'form': form, 'title': 'Create Post'})
 
+@require_POST
+def comment_create(request, post_id):
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user.author
+        comment.post = Post.objects.get(pk=post_id)
+        comment.save()
+        return redirect('blog:post_detail', post_id=post_id)
+    else:
+        return render(request, reverse('blog:post_detail'), context={'form': form})

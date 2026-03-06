@@ -1,7 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.forms import forms, BooleanField, Textarea, PasswordInput, \
-    RadioSelect, DateInput, CheckboxInput, TextInput
+    RadioSelect, DateInput, CheckboxInput, TextInput, CheckboxSelectMultiple
 from django.forms.fields import EmailField, CharField, ChoiceField, DateField
+from django.forms.models import ModelForm
+
+from .models import Post, Comment
 
 
 class FeedbackForm(forms.Form):  # Оболочка над html-form
@@ -15,16 +18,49 @@ class FeedbackForm(forms.Form):  # Оболочка над html-form
         return feedback
 
 
-class PostForm(forms.Form):
-    title = CharField(label='Title of your post', max_length=255)
-    content = CharField(label='Your post content')
-    published = BooleanField(label='Publish post', initial=True, help_text='If not checked, the post goes to drafts')
-    # tags = ModelMultipleChoiceField(
-    #     queryset=Tag.objects.all(),
-    #     widget=CheckboxSelectMultiple,  # Or forms.SelectMultiple
-    #     required=False,
-    # )
+class PostForm(ModelForm):
+    terms_of_service = BooleanField(label='Согласен с условиями публикации',
+                                    help_text='Нажимая, я даю право свободно распространять данные',
+                                    error_messages={'required': 'Для публикации нужно согласиться с условиями обслуживания'})
 
+
+    class Meta:
+        model = Post
+        exclude = ['views', 'author']
+        widgets = {
+            # Использовать большое текстовое поле для content
+            'content': Textarea(attrs={'rows': 10, 'class': 'content-editor'}),
+            # Использовать радио-кнопки для поля status
+            'status': RadioSelect,
+            # Использовать чекбоксы для выбора тегов (ManyToMany)
+            # 'tags': CheckboxSelectMultiple,
+            # Добавить CSS класс к полю title
+            'title': TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'title': 'Заголовок',
+            'content': 'Текст поста',
+            'published': 'Опубликовать?'
+        }
+        help_texts = {
+            'published': 'Если отключено, то пост будет сохранён, как черновик',
+            'tags': 'Зажмите Ctrl(Cmd), для выделения нескольких тэгов'
+        }
+        error_messages = {
+            'content': {'required': 'Нельзя создать пустой пост'},
+            'title': {'required': 'Укажите название поста', 'max_length': 'Название слишком длинное'},
+        }
+
+    def clean_terms_of_service(self):
+        if not self.cleaned_data['terms_of_service']:
+            raise ValidationError
+        del self.cleaned_data['terms_of_service']
+
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
 
 class ExampleForm(forms.Form):
     # Использовать многострочное поле вместо однострочного
@@ -65,4 +101,3 @@ for _field in StyledForm.base_fields.values():
     css_class = _field.widget.attrs.get('class', '')
     if 'form-check-input' not in css_class:
         _field.widget.attrs['class'] = f"{css_class} form-control".strip()
-

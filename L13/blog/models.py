@@ -15,8 +15,8 @@ class Author(models.Model):
 
 class Post(models.Model):
 
-    title = models.CharField(max_length=255, verbose_name='Название')
-    content = models.TextField(blank=True, verbose_name='Содержимое')
+    title = models.CharField(max_length=50, verbose_name='Название')
+    content = models.TextField(verbose_name='Содержимое')
 
     published = models.BooleanField(default=False, verbose_name='Опубликовано')
 
