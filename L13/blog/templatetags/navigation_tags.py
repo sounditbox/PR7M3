@@ -9,10 +9,7 @@ def active_url(context, pattern_name):
         current = context.request.resolver_match
     except AttributeError:
         return ''
-    if not current:
-        return ''
-    if current.view_name == pattern_name:
-        return 'active'
-    if current.namespace and f"{current.namespace}:{current.url_name}" == pattern_name:
+    if (current.view_name == pattern_name or
+            current.namespace and f"{current.namespace}:{current.url_name}" == pattern_name):
         return 'active'
     return ''
