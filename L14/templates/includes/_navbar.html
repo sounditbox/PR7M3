@@ -1,0 +1,26 @@
+{% load navigation_tags %}
+<nav class="navbar navbar-expand-lg sticky-top bg-white bg-opacity-75 border-bottom border-light-subtle backdrop-blur">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'blog:post_list' %}">MyBlog</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% active_url 'blog:post_list' %}" href="{% url 'blog:post_list' %}">Posts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% active_url 'blog:add_post' %}" href="{% url 'blog:add_post' %}">Create post</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% active_url 'blog:feedback' %}" href="{% url 'blog:feedback' %}">Feedback</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill text-bg-primary-subtle text-primary-emphasis px-3 py-2">Blog App</span>
+            </div>
+        </div>
+    </div>
+</nav>
