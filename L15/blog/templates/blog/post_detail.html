@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | L13 Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <article class="glass-card rounded-5 p-4 p-lg-5 mb-4">
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                {% for tag in post.tags.all %}
+                    <span class="badge rounded-pill tag-pill px-3 py-2">#{{ tag.name }}</span>
+                {% empty %}
+                    <span class="badge rounded-pill text-bg-light px-3 py-2">No tags yet</span>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 text-secondary mb-3">
+                <span>Author: {{ post.author|default:"Unknown author" }}</span>
+                <span>{{ post.created_at|date:"d M Y, H:i" }}</span>
+                <span>Views: {{ post.views }}</span>
+            </div>
+
+            <h1 class="display-6 fw-bold mb-3">{{ post.title }}</h1>
+            <div class="fs-5 lh-lg text-secondary">{{ post.content|linebreaks }}</div>
+
+            <div class="d-flex flex-wrap gap-2 pt-4 mt-4 border-top">
+                <a href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit post</a>
+                <a href="{% url 'blog:post_delete' post.id %}" class="btn btn-outline-danger">Delete</a>
+                <a href="{% url 'blog:post_list' %}" class="btn btn-light border">Back to posts</a>
+            </div>
+        </article>
+
+        <section class="glass-card rounded-5 p-4 p-lg-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h3 mb-1">Comments</h2>
+                    <p class="text-secondary mb-0">Discussion around this post.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-primary px-3 py-2">{{ post.comments.count }}</span>
+            </div>
+
+            <div class="vstack gap-3">
+            <form method="post" action="{% url 'blog:comment_create' post.pk %}" novalidate>
+                {% csrf_token %}
+                {% include "includes/_form_fields.html" %}
+                <div class="d-flex flex-wrap gap-2 pt-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Комментировать</button>
+                </div>
+            </form>
+
+                {% for comment in post.comments.all %}
+                    <div class="card border-0 bg-light-subtle rounded-4">
+                        <div class="card-body p-4">
+                            <p class="mb-3">{{ comment.content }}</p>
+                            <div class="small text-secondary">
+                                {{ comment.author.user.username|default:"Unknown user" }} · {{ comment.created_at|date:"d M Y, H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5">
+                        <h3 class="h5 mb-2">No comments yet</h3>
+                        <p class="text-secondary mb-0">Looks suspiciously peaceful here.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
