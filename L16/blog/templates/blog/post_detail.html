@@ -60,7 +60,13 @@
                                 {{ comment.author.user.username|default:"Unknown user" }} · {{ comment.created_at|date:"d M Y, H:i" }}
                             </div>
                         </div>
-<!--                        <a class="card link" href=""></a>-->
+                        {% if user.is_authenticated and user.author == comment.author %}
+                            <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
+                                {% csrf_token %}
+                                <button class="card-link" type="submit">🗑️</button>
+                            </form>
+                        {% endif %}
+
                     </div>
                 {% empty %}
                     <div class="text-center py-5">

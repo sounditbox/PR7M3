@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import PostListView, PostDetailView, \
-    PostCreateView, PostUpdateView, PostDeleteView, FeedbackView, create_post, comment_create
+    PostCreateView, PostUpdateView, PostDeleteView, FeedbackView, create_post, comment_create, CommentDeleteView
 
 app_name = 'blog'
 
@@ -13,5 +13,7 @@ urlpatterns = [
     path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
     path('feedback/', FeedbackView.as_view(), name='feedback'),
     path('posts/create/fbv/', create_post),
-    path('posts/<int:post_id>/comment', comment_create, name='comment_create')
+    path('posts/<int:post_id>/comment', comment_create, name='comment_create'),
+    path('comments/<int:pk>/delete', CommentDeleteView.as_view(), name='comment_delete'),
+
 ]

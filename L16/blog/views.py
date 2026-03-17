@@ -12,7 +12,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from .forms import PostForm, StyledForm, CommentForm
 from .mixins import ErrorMessageMixin
-from .models import Post
+from .models import Post, Comment
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,6 +57,7 @@ class PostDetailView(DetailView):
         context['form'] = CommentForm()
         return context
 
+
 # MRO - method resolution order
 class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, CreateView):
     model = Post
@@ -72,6 +73,7 @@ class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin,
         post.save()
         return super().form_valid(form)
 
+
 class PostUpdateView(SuccessMessageMixin, ErrorMessageMixin, UpdateView):
     model = Post
     template_name = 'blog/post_create_update.html'
@@ -79,7 +81,6 @@ class PostUpdateView(SuccessMessageMixin, ErrorMessageMixin, UpdateView):
     extra_context = {'title': 'Update Post'}
     success_message = 'Пост успешно обновлён'
     error_message = 'При обновлении поста что-то пошло не так:('
-
 
 
 class PostDeleteView(SuccessMessageMixin, ErrorMessageMixin, DeleteView):
@@ -127,4 +128,12 @@ def comment_create(request, post_id):
         return redirect('blog:post_detail', post_id=post_id)
     else:
         messages.error(request, 'При создании комментария что-то пошло не так:(')
-        return render(request, reverse('blog:post_detail'), context={'form': form})
+        return render(request, reverse('blog:post_detail', kwargs={'post_id': post_id}), context={'form': form})
+
+
+class CommentDeleteView(SuccessMessageMixin, DeleteView):
+    model = Comment
+    success_message = 'Комментарий успешно удалён'
+
+    def get_success_url(self):
+        return reverse_lazy('blog:post_detail', kwargs={'post_id': self.object.post.pk})
