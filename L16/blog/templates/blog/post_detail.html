@@ -8,9 +8,9 @@
         <article class="glass-card rounded-5 p-4 p-lg-5 mb-4">
             <div class="d-flex flex-wrap gap-2 mb-4">
                 {% for tag in post.tags.all %}
-                    <span class="badge rounded-pill tag-pill px-3 py-2">#{{ tag.name }}</span>
+                <span class="badge rounded-pill tag-pill px-3 py-2">#{{ tag.name }}</span>
                 {% empty %}
-                    <span class="badge rounded-pill text-bg-light px-3 py-2">No tags yet</span>
+                <span class="badge rounded-pill text-bg-light px-3 py-2">No tags yet</span>
                 {% endfor %}
             </div>
 
@@ -41,38 +41,42 @@
 
             <div class="vstack gap-3">
                 {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'blog:comment_create' post.pk %}" novalidate>
-                        {% csrf_token %}
-                        {% include "includes/_form_fields.html" %}
-                        <div class="d-flex flex-wrap gap-2 pt-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Комментировать</button>
-                        </div>
-                    </form>
+                <form method="post" action="{% url 'blog:comment_create' post.pk %}" novalidate>
+                    {% csrf_token %}
+                    {% include "includes/_form_fields.html" %}
+                    <div class="d-flex flex-wrap gap-2 pt-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Комментировать</button>
+                    </div>
+                </form>
                 {% else %}
-                    <p><a href="{% url 'users:login' %}">Войдите</a> или <a href="{% url 'users:register' %}">зарегистрируйтесь</a>,
-                        чтобы оставить комментарий</p>
+                <p><a href="{% url 'users:login' %}">Войдите</a> или <a href="{% url 'users:register' %}">зарегистрируйтесь</a>,
+                    чтобы оставить комментарий</p>
                 {% endif %}
                 {% for comment in post.comments.all %}
-                    <div class="card border-0 bg-light-subtle rounded-4">
-                        <div class="card-body p-4">
-                            <p class="mb-3">{{ comment.content }}</p>
-                            <div class="small text-secondary">
-                                {{ comment.author.user.username|default:"Unknown user" }} · {{ comment.created_at|date:"d M Y, H:i" }}
-                            </div>
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <p class="mb-3">{{ comment.content }}</p>
+                        <div class="small text-secondary">
+                            {{ comment.author.user.username|default:"Unknown user" }} · {{ comment.created_at|date:"d M Y, H:i" }}
                         </div>
-                        {% if user.is_authenticated and user.author == comment.author %}
-                            <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
-                                {% csrf_token %}
-                                <button class="card-link" type="submit">🗑️</button>
-                            </form>
-                        {% endif %}
 
                     </div>
-                {% empty %}
-                    <div class="text-center py-5">
-                        <h3 class="h5 mb-2">No comments yet</h3>
-                        <p class="text-secondary mb-0">Looks suspiciously peaceful here.</p>
+                    <div class="col align-self-end">
+                        {% if user.is_authenticated and user.author == comment.author %}
+                        <form method="post" action="{% url 'blog:comment_delete' comment.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" type="submit">🗑️</button>
+                        </form>
+                        {% endif %}
                     </div>
+
+
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <h3 class="h5 mb-2">No comments yet</h3>
+                    <p class="text-secondary mb-0">Looks suspiciously peaceful here.</p>
+                </div>
                 {% endfor %}
             </div>
         </section>
