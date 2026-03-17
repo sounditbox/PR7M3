@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
-from django.views.generic import FormView, CreateView, DetailView, TemplateView, UpdateView
+from django.views.generic import FormView, CreateView, TemplateView, UpdateView
 
 from .forms import UserUpdateForm
 
@@ -29,7 +29,7 @@ def login_user(request: HttpRequest) -> HttpResponse:
 class LoginUserView(FormView):
     form_class = AuthenticationForm
     template_name = 'registration/login.html'
-    success_url = reverse_lazy('blog:post_list')
+    success_url = reverse_lazy('blog:profile')
 
     def form_valid(self, form: AuthenticationForm):
         login(request=self.request, user=form.user_cache)
@@ -40,11 +40,12 @@ class LoginUserView(FormView):
         messages.error(self.request, 'Login failed!')
         return super().form_invalid(form)
 
+
 class CreateUserView(CreateView):
     model = get_user_model()
     form_class = UserCreationForm
     template_name = 'registration/register.html'
-    success_url = reverse_lazy('blog:post_list')
+    success_url = reverse_lazy('users:profile')
 
 
 
@@ -57,6 +58,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context['posts'] = self.request.user.author.posts.all()
         context['comments'] = self.request.user.author.comments.all()
         return context
+
 
 class UpdateUserView(UpdateView):
     model = get_user_model()
