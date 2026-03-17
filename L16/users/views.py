@@ -29,7 +29,7 @@ def login_user(request: HttpRequest) -> HttpResponse:
 class LoginUserView(FormView):
     form_class = AuthenticationForm
     template_name = 'registration/login.html'
-    success_url = reverse_lazy('blog:profile')
+    success_url = reverse_lazy('users:profile')
 
     def form_valid(self, form: AuthenticationForm):
         login(request=self.request, user=form.user_cache)
