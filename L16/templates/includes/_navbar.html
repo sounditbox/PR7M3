@@ -20,7 +20,7 @@
             </ul>
             <div class="d-flex align-items-center gap-2">
                     {% if user.is_authenticated %}
-                        {{ user.username }}
+                        <a href="{% url 'users:profile' %}">{{ user.username }}<a>
                         {% include "includes/_logout.html" %}
                     {% else %}
                         <a class="btn btn-primary" href="{% url 'users:login' %}">Войти</a>

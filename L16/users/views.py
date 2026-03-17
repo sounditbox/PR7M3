@@ -1,11 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
-from django.views.generic import FormView, CreateView
+from django.views.generic import FormView, CreateView, DetailView, TemplateView, UpdateView
+
+from .forms import UserUpdateForm
 
 
 # fbv for AuthN
@@ -42,3 +45,21 @@ class CreateUserView(CreateView):
     form_class = UserCreationForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('blog:post_list')
+
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = UserUpdateForm(instance=self.request.user)
+        context['posts'] = self.request.user.author.posts.all()
+        context['comments'] = self.request.user.author.comments.all()
+        return context
+
+class UpdateUserView(UpdateView):
+    model = get_user_model()
+    form_class = UserUpdateForm
+    success_url = reverse_lazy('users:profile')
+    # template_name = 'users/profile.html'
