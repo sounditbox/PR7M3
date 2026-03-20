@@ -1,18 +1,19 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import F
 from django.db.models.aggregates import Count
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
 from .forms import PostForm, StyledForm, CommentForm
 from .mixins import ErrorMessageMixin
-from .models import Post, Comment
+from .models import Post, Comment, Author
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,7 +70,7 @@ class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin,
 
     def form_valid(self, form):
         post = form.save(commit=False)
-        post.author = self.request.user.author
+        post.author, _ = Author.objects.get_or_create(user=self.request.user)
         post.save()
         return super().form_valid(form)
 
@@ -100,6 +101,7 @@ class FeedbackView(FormView):
         return super().form_valid(form)
 
 
+@login_required
 def create_post(request):
     if request.method == 'GET':
         form = PostForm()
@@ -107,8 +109,9 @@ def create_post(request):
     form = PostForm(request.POST)
     if form.is_valid():
         post = form.save(commit=False)
-        post.author = request.user.author
+        post.author, _ = Author.objects.get_or_create(user=request.user)
         post.save()
+        form.save_m2m()
         messages.success(request, 'Пост успешно создан!')
         return redirect('blog:post_detail', post_id=post.pk)
     else:
@@ -116,19 +119,21 @@ def create_post(request):
         return render(request, 'blog/post_create_update.html', context={'form': form, 'title': 'Create Post'})
 
 
+@login_required
 @require_POST
 def comment_create(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST)
     if form.is_valid():
         comment = form.save(commit=False)
-        comment.author = request.user.author
-        comment.post = Post.objects.get(pk=post_id)
+        comment.author, _ = Author.objects.get_or_create(user=request.user)
+        comment.post = post
         comment.save()
         messages.success(request, 'Комментарий добавлен!')
         return redirect('blog:post_detail', post_id=post_id)
     else:
         messages.error(request, 'При создании комментария что-то пошло не так:(')
-        return render(request, reverse('blog:post_detail', kwargs={'post_id': post_id}), context={'form': form})
+        return render(request, 'blog/post_detail.html', context={'post': post, 'form': form})
 
 
 class CommentDeleteView(SuccessMessageMixin, DeleteView):

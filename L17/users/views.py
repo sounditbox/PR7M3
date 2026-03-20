@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, CreateView, TemplateView, UpdateView
 
+from blog.models import Author
 from .forms import UserUpdateForm
 
 
@@ -33,6 +34,7 @@ class LoginUserView(FormView):
 
     def form_valid(self, form: AuthenticationForm):
         login(request=self.request, user=form.user_cache)
+        Author.objects.get_or_create(user=self.request.user)
         messages.success(self.request, 'Login success!')
         return super().form_valid(form)
 
@@ -47,6 +49,12 @@ class CreateUserView(CreateView):
     template_name = 'registration/register.html'
     success_url = reverse_lazy('users:profile')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        Author.objects.get_or_create(user=self.object)
+        return response
+
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
@@ -54,9 +62,10 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        author, _ = Author.objects.get_or_create(user=self.request.user)
         context['form'] = UserUpdateForm(instance=self.request.user)
-        context['posts'] = self.request.user.author.posts.all()
-        context['comments'] = self.request.user.author.comments.all()
+        context['posts'] = author.posts.all()
+        context['comments'] = author.comments.all()
         return context
 
 
