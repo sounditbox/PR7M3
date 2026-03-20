@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile: {{ user.username }}{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <div class="col-md-6 col-xl-12">
+        <div class="card stats-tile glass-card rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="text-secondary small text-uppercase fw-semibold mb-2">Profile</div>
+                <div class="display-6 fw-bold mb-0">Основная информация</div>
+                <form action="{% url 'users:user_update' user.pk %}" method="post">
+                    {% csrf_token %}
+                    {% include 'includes/_form_fields.html' %}
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card stats-tile glass-card rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="text-secondary small text-uppercase fw-semibold mb-2">Total posts</div>
+                <div class="display-6 fw-bold mb-0">{{ posts|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stats-tile glass-card rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="text-secondary small text-uppercase fw-semibold mb-2">Comments</div>
+                <div class="display-6 fw-bold mb-0">{{ comments|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card stats-tile glass-card rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="text-secondary small text-uppercase fw-semibold mb-2">Likes</div>
+                <div class="display-6 fw-bold mb-0">100500</div>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Latest posts</h2>
+            <p class="text-secondary mb-0">Yours, of course</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for post in posts %}
+        <div class="col-12 col-lg-6">
+            {% include "includes/_post_card.html" with post=post %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="glass-card rounded-4 p-5 text-center">
+                <h3 class="h4 mb-2">No posts yet</h3>
+                <p class="text-secondary mb-4">Start with the first one and make this thing useful.</p>
+                <a class="btn btn-primary" href="{% url 'blog:add_post' %}">Create first post</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% include "includes/_pagination.html" %}
+</section>
+
+{% endblock %}
