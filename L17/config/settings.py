@@ -101,3 +101,15 @@ MESSAGE_TAGS = {
 }
 
 LOGIN_URL = reverse_lazy('users:login')
+
+# Simple Mail Transfer Protocol
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+FROM_EMAIL = 'blogapp@example.com'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_USE_TLS = False
+
+SITE_NAME = 'BlogApp'

@@ -22,7 +22,7 @@
         </form>
 
         <div class="fadeIn second" id="formFooter">
-            <a class="underlineHover" href="#">Забыли пароль?</a>
+            <a class="underlineHover" href="{% url 'users:password_reset' %}">Забыли пароль?</a>
             <p class="underlineHover" >Нет аккаунта? <a href="{% url 'users:register' %}">Зарегистрироваться</a></p>
         </div>
 
