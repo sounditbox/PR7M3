@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 from django.contrib import messages
@@ -103,13 +102,13 @@ MESSAGE_TAGS = {
 LOGIN_URL = reverse_lazy('users:login')
 
 # Simple Mail Transfer Protocol
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-FROM_EMAIL = 'blogapp@example.com'
-# EMAIL_HOST = 'localhost'
-# EMAIL_PORT = 1025
-# EMAIL_HOST_USER = ''
-# EMAIL_HOST_PASSWORD = ''
-# EMAIL_USE_TLS = False
+FROM_EMAIL = EMAIL_HOST_USER = ADMIN_EMAIL = 'blabla42bla42bla@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = 'iwoz mcqu gyps hzkd'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
 SITE_NAME = 'BlogApp'

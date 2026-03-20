@@ -1,6 +1,7 @@
+from blog.models import Author
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
@@ -8,8 +9,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, CreateView, TemplateView, UpdateView
 
-from blog.models import Author
-from .forms import UserUpdateForm
+from .forms import UserUpdateForm, UserCreateForm
 
 
 # fbv for AuthN
@@ -45,7 +45,7 @@ class LoginUserView(FormView):
 
 class CreateUserView(CreateView):
     model = get_user_model()
-    form_class = UserCreationForm
+    form_class = UserCreateForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('users:profile')
 
@@ -54,7 +54,6 @@ class CreateUserView(CreateView):
         login(self.request, self.object)
         Author.objects.get_or_create(user=self.object)
         return response
-
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
