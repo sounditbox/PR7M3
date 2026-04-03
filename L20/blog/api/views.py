@@ -1,3 +1,5 @@
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +12,9 @@ from ..models import Post
 # Retrieve List Create Update Destroy
 
 class CreateListPostAPIView(APIView):
+    # authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request: Request) -> Response:
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():

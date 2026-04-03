@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 from django.contrib import messages
@@ -24,7 +25,9 @@ INSTALLED_APPS = [
     'django_extensions',
 
     'rest_framework',
-    
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+
     'blog',
     'users'
 ]
@@ -114,3 +117,18 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 SITE_NAME = 'BlogApp'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
