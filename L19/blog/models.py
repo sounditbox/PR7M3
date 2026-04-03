@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 
+from .validators import validate_content
+
 
 class Author(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
@@ -15,8 +17,8 @@ class Author(models.Model):
 
 class Post(models.Model):
 
-    title = models.CharField(max_length=50, verbose_name='Название')
-    content = models.TextField(verbose_name='Содержимое')
+    title = models.CharField(max_length=50, validators=[validate_content], verbose_name='Название')
+    content = models.TextField(validators=[validate_content], verbose_name='Содержимое')
 
     published = models.BooleanField(default=False, verbose_name='Опубликовано')
 
