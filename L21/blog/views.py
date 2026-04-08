@@ -1,13 +1,13 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import F
 from django.db.models.aggregates import Count
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
@@ -23,12 +23,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class PostListView(ListView):
+class PostListView(PermissionRequiredMixin, ListView):
     model = Post
     queryset = Post.objects.filter(published=True).order_by('-created_at').annotate(comments_count=Count('comments'))
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'  # default value: object_list
     paginate_by = 10
+    permission_required = ['blog.view_post']
 
     def get_context_data(
             self, *, object_list=..., **kwargs
@@ -41,11 +42,12 @@ class PostListView(ListView):
         return context
 
 
-class PostDetailView(DetailView):
+class PostDetailView(PermissionRequiredMixin, DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'  # default value: object
     pk_url_kwarg = 'post_id'  # default value: pk
+    permission_required = ['blog.view_post']
 
     def get(self, request, *args, **kwargs):
         post = self.get_object()
@@ -60,13 +62,14 @@ class PostDetailView(DetailView):
 
 
 # MRO - method resolution order
-class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, CreateView):
+class PostCreateView(PermissionRequiredMixin, LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_create_update.html'
     extra_context = {'title': 'Create Post'}
     success_message = 'Пост успешно создан!'
     error_message = 'При создании поста что-то пошло не так:('
+    permission_required = ['blog.add_post']
 
     def form_valid(self, form):
         post = form.save(commit=False)
@@ -75,20 +78,22 @@ class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, ErrorMessageMixin,
         return super().form_valid(form)
 
 
-class PostUpdateView(SuccessMessageMixin, ErrorMessageMixin, UpdateView):
+class PostUpdateView(PermissionRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, UpdateView):
     model = Post
     template_name = 'blog/post_create_update.html'
     fields = ['title', 'content', 'tags', 'published']
     extra_context = {'title': 'Update Post'}
     success_message = 'Пост успешно обновлён'
     error_message = 'При обновлении поста что-то пошло не так:('
+    permission_required = ['blog.change_post']
 
 
-class PostDeleteView(SuccessMessageMixin, ErrorMessageMixin, DeleteView):
+class PostDeleteView(PermissionRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, DeleteView):
     model = Post
     template_name = 'blog/post_delete.html'
     success_url = reverse_lazy('blog:post_list')
     success_message = 'Пост успешно удалён'
+    permission_required = ['blog.delete_post']
 
 
 class FeedbackView(FormView):
@@ -102,6 +107,7 @@ class FeedbackView(FormView):
 
 
 @login_required
+@permission_required('blog.add_post')
 def create_post(request):
     if request.method == 'GET':
         form = PostForm()
@@ -121,6 +127,7 @@ def create_post(request):
 
 @login_required
 @require_POST
+@permission_required('blog.add_comment')
 def comment_create(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST)
@@ -136,9 +143,10 @@ def comment_create(request, post_id):
         return render(request, 'blog/post_detail.html', context={'post': post, 'form': form})
 
 
-class CommentDeleteView(SuccessMessageMixin, DeleteView):
+class CommentDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Comment
     success_message = 'Комментарий успешно удалён'
+    permission_required = ['blog.delete_comment']
 
     def get_success_url(self):
         return reverse_lazy('blog:post_detail', kwargs={'post_id': self.object.post.pk})

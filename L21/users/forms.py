@@ -23,3 +23,4 @@ class UserCreateForm(UserCreationForm):
         if get_user_model().objects.filter(email=email).exists():
             raise forms.ValidationError('Email already exists.')
         return email
+

@@ -1,9 +1,10 @@
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .permissions import IsAuthor, IsAuthorOrReadOnly
 from .serializers import PostSerializer, ShortPostSerializer
 from ..models import Post
 
@@ -13,7 +14,7 @@ from ..models import Post
 
 class CreateListPostAPIView(APIView):
     # authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request: Request) -> Response:
         serializer = PostSerializer(data=request.data)
@@ -29,20 +30,24 @@ class CreateListPostAPIView(APIView):
 
 
 class RetrieveDeleteUpdatePostAPIView(APIView):
+    permission_classes = [IsAuthorOrReadOnly]
+
     def get(self, request: Request, pk: int) -> Response:
         post = Post.objects.get(id=pk)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
-    # def put(self, request: Request, pk: int) -> Response:
-    #     post = Post.objects.get(id=pk)
-    #     serializer = PostSerializer(instance=post, )
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=201)
-    #     return Response(serializer.errors, status=400)
+    def put(self, request: Request, pk: int) -> Response:
+        post = Post.objects.get(id=pk)
+        self.check_object_permissions(request, post)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
     def delete(self, request: Request, pk: int) -> Response:
         post = Post.objects.get(id=pk)
+        self.check_object_permissions(request, post)
         post.delete()
         return Response(status=204)

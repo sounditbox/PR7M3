@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Permission
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -52,7 +53,14 @@ class CreateUserView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         login(self.request, self.object)
+        permissions = Permission.objects.filter(codename__in=('add_post', 'change_post',
+                                                              'delete_post', 'add_comment',
+                                                              'change_comment', 'delete_comment'))
+        for p in permissions:
+            self.object.user_permissions.add(p)
         Author.objects.get_or_create(user=self.object)
+        form.save()
+        messages.success(self.request, 'Registration success!')
         return response
 
 

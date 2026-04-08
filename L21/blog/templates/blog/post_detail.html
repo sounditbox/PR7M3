@@ -24,8 +24,10 @@
             <div class="fs-5 lh-lg text-secondary">{{ post.content|linebreaks }}</div>
 
             <div class="d-flex flex-wrap gap-2 pt-4 mt-4 border-top">
-                <a href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit post</a>
-                <a href="{% url 'blog:post_delete' post.id %}" class="btn btn-outline-danger">Delete</a>
+                {% if request.user.is_authenticated and request.user.author == post.author %}
+                    <a href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit post</a>
+                    <a href="{% url 'blog:post_delete' post.id %}" class="btn btn-outline-danger">Delete</a>
+                {% endif %}
                 <a href="{% url 'blog:post_list' %}" class="btn btn-light border">Back to posts</a>
             </div>
         </article>
