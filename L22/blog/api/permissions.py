@@ -10,8 +10,5 @@ class IsAuthor(BasePermission):
 
 class IsAuthorOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.method in SAFE_METHODS or (
-            getattr(obj, 'author', None) is not None
-            and obj.author.user_id == request.user.id
-        )
+        return request.method in SAFE_METHODS or IsAuthor().has_object_permission(request, view, obj)
 
