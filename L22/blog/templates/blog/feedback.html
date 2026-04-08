@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback | L13 Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <div class="hero-card rounded-5 h-100 p-4 p-lg-5 shadow-lg">
+                    <span class="badge text-bg-light text-primary-emphasis rounded-pill px-3 py-2 mb-3">Feedback</span>
+                    <h1 class="h2 fw-bold mb-3">Tell us what works and what still hurts</h1>
+                    <p class="opacity-75 mb-0">The form is now styled, readable, and doesn’t scream “default HTML from 2008”.</p>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="glass-card rounded-5 p-4 p-lg-5 h-100">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% include "includes/_form_fields.html" %}
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Send feedback</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
