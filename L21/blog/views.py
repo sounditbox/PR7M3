@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
 from .forms import PostForm, StyledForm, CommentForm
-from .mixins import ErrorMessageMixin
+from .mixins import ErrorMessageMixin, AuthorRequiredMixin
 from .models import Post, Comment, Author
 
 logging.basicConfig(
@@ -78,24 +78,18 @@ class PostCreateView(PermissionRequiredMixin, LoginRequiredMixin, SuccessMessage
         return super().form_valid(form)
 
 
-class PostUpdateView(PermissionRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, UpdateView):
     model = Post
     template_name = 'blog/post_create_update.html'
     fields = ['title', 'content', 'tags', 'published']
     extra_context = {'title': 'Update Post'}
     success_message = 'Пост успешно обновлён'
     error_message = 'При обновлении поста что-то пошло не так:('
-    permission_required = ['blog.change_post']
-
-
-class PostDeleteView(PermissionRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, DeleteView):
+class PostDeleteView(LoginRequiredMixin, AuthorRequiredMixin, SuccessMessageMixin, ErrorMessageMixin, DeleteView):
     model = Post
     template_name = 'blog/post_delete.html'
     success_url = reverse_lazy('blog:post_list')
     success_message = 'Пост успешно удалён'
-    permission_required = ['blog.delete_post']
-
-
 class FeedbackView(FormView):
     form_class = StyledForm
     template_name = 'blog/feedback.html'
@@ -143,10 +137,9 @@ def comment_create(request, post_id):
         return render(request, 'blog/post_detail.html', context={'post': post, 'form': form})
 
 
-class CommentDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+class CommentDeleteView(LoginRequiredMixin, AuthorRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Comment
     success_message = 'Комментарий успешно удалён'
-    permission_required = ['blog.delete_comment']
 
     def get_success_url(self):
         return reverse_lazy('blog:post_detail', kwargs={'post_id': self.object.post.pk})

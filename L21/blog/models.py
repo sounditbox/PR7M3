@@ -15,8 +15,8 @@ class Author(models.Model):
         verbose_name = 'Автор'
         verbose_name_plural = 'Авторы'
 
-class Post(models.Model):
 
+class Post(models.Model):
     title = models.CharField(max_length=50, validators=[validate_content], verbose_name='Название')
     content = models.TextField(validators=[validate_content], verbose_name='Содержимое')
 
@@ -25,11 +25,16 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
-    author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, related_name='posts',
-                               verbose_name='Автор')
+    author = models.ForeignKey(
+        Author,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='posts',
+        verbose_name='Автор',
+    )
 
     views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
-    tags = models.ManyToManyField('Tag', null=True, blank=True, related_name='posts', verbose_name='Теги')
+    tags = models.ManyToManyField('Tag', blank=True, related_name='posts', verbose_name='Теги')
 
     def get_absolute_url(self):
         return reverse('blog:post_detail', kwargs={'post_id': self.pk})
@@ -43,22 +48,18 @@ class Post(models.Model):
         ordering = ['-created_at']
 
 
-
 class Comment(models.Model):
     content = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
 
-
     def __str__(self):
         return f'{self.author} | {self.post} - {self.content}'
-
 
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-
 
 
 class Tag(models.Model):

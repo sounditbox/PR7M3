@@ -53,13 +53,10 @@ class CreateUserView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         login(self.request, self.object)
-        permissions = Permission.objects.filter(codename__in=('add_post', 'change_post',
-                                                              'delete_post', 'add_comment',
-                                                              'change_comment', 'delete_comment'))
+        permissions = Permission.objects.filter(codename__in=('view_post', 'add_post', 'add_comment'))
         for p in permissions:
             self.object.user_permissions.add(p)
         Author.objects.get_or_create(user=self.object)
-        form.save()
         messages.success(self.request, 'Registration success!')
         return response
 
@@ -76,8 +73,18 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class UpdateUserView(UpdateView):
+class UpdateUserView(LoginRequiredMixin, UpdateView):
     model = get_user_model()
     form_class = UserUpdateForm
     success_url = reverse_lazy('users:profile')
-    # template_name = 'users/profile.html'
+    template_name = 'users/profile.html'
+
+    def get_queryset(self):
+        return self.model.objects.filter(pk=self.request.user.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        author, _ = Author.objects.get_or_create(user=self.request.user)
+        context['posts'] = author.posts.all()
+        context['comments'] = author.comments.all()
+        return context
