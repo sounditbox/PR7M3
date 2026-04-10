@@ -3,11 +3,13 @@ from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination, CursorPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .pagination import PostPagination, CommentPagination
 from .permissions import IsAuthorOrReadOnly, IsAuthor
 from .serializers import PostSerializer, ShortPostSerializer, CommentSerializer
 from ..models import Post, Author, Comment
@@ -78,6 +80,8 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthor]
     # authentication_classes = []
+    pagination_class = PostPagination
+
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -104,9 +108,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthor]
-
-    def get_queryset(self):
-        return self.queryset.filter(post=self.request.query_params['post_id'])
+    pagination_class = CommentPagination
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
