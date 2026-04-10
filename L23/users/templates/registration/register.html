@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} BlogApp | Авторизация {% endblock %}
+
+{% block extra_js %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+        <form class="fadeIn first" method="post" action="{% url 'users:register' %}">
+            {% csrf_token %}
+            {% include 'includes/_form_fields.html' %}
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </form>
+
+        <div class="fadeIn second" id="formFooter">
+            <p class="underlineHover" >Уже есть аккаунт? <a href="{% url 'users:login' %}">Войти</a></p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
