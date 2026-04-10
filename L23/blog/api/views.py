@@ -123,9 +123,12 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthor]
     pagination_class = CommentPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     # filterset_fields = ['post']
     filterset_class = CommentFilter
+    search_fields = ['content', 'post__title', 'post__content']
+    ordering_fields = ['created_at', 'post']
+
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -133,3 +136,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         elif self.action == 'create':
             return [IsAuthenticatedOrReadOnly()]
         return [IsAuthor()]
+
