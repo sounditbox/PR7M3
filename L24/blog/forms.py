@@ -7,54 +7,49 @@ from django.forms.models import ModelForm
 from .models import Post, Comment
 
 
-class FeedbackForm(forms.Form):  # Оболочка над html-form
+class FeedbackForm(forms.Form):
     email = EmailField(label='Your E-mail', error_messages={'invalid': 'Input an actual e-mail!'})
     feedback = CharField(label='Your Message', max_length=500)
 
     def clean_feedback(self):
         feedback = self.cleaned_data.get('feedback')
-        if any(word in feedback.split() for word in ['блин', 'ё-моё', 'shit', 'fuuuu']):
+        if any(word in feedback.split() for word in ['shit', 'fuuuu']):
             raise ValidationError('No curse words allowed!')
         return feedback
 
 
 class PostForm(ModelForm):
-    terms_of_service = BooleanField(label='Согласен с условиями публикации',
-                                    help_text='Нажимая, я даю право свободно распространять данные',
-                                    error_messages={'required': 'Для публикации нужно согласиться с условиями обслуживания'})
-
+    terms_of_service = BooleanField(
+        label='Agree to publication terms',
+        help_text='By submitting, you allow this content to be published.',
+        error_messages={'required': 'You must accept the publication terms.'}
+    )
 
     class Meta:
         model = Post
         exclude = ['views', 'author']
         widgets = {
-            # Использовать большое текстовое поле для content
             'content': Textarea(attrs={'rows': 10, 'class': 'content-editor'}),
-            # Использовать радио-кнопки для поля status
-            'status': RadioSelect,
-            # Использовать чекбоксы для выбора тегов (ManyToMany)
-            # 'tags': CheckboxSelectMultiple,
-            # Добавить CSS класс к полю title
             'title': TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'title': 'Заголовок',
-            'content': 'Текст поста',
-            'published': 'Опубликовать?'
+            'title': 'Title',
+            'content': 'Post content',
+            'published': 'Publish?'
         }
         help_texts = {
-            'published': 'Если отключено, то пост будет сохранён, как черновик',
-            'tags': 'Зажмите Ctrl(Cmd), для выделения нескольких тэгов'
+            'published': 'If disabled, the post will be saved as a draft.',
+            'tags': 'Use Ctrl/Cmd to select multiple tags.'
         }
         error_messages = {
-            'content': {'required': 'Нельзя создать пустой пост'},
-            'title': {'required': 'Укажите название поста', 'max_length': 'Название слишком длинное'},
+            'content': {'required': 'Post content is required.'},
+            'title': {'required': 'Post title is required.', 'max_length': 'Title is too long.'},
         }
 
     def clean_terms_of_service(self):
         if not self.cleaned_data['terms_of_service']:
             raise ValidationError
-        del self.cleaned_data['terms_of_service']
+        return self.cleaned_data['terms_of_service']
 
 
 class CommentForm(ModelForm):
@@ -62,41 +57,37 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ['content']
 
+
 class ExampleForm(forms.Form):
-    # Использовать многострочное поле вместо однострочного
     description = CharField(widget=Textarea)
-    # Использовать поле для пароля (скрывает ввод)
     password = CharField(widget=PasswordInput)
-    # Использовать радио-кнопки вместо выпадающего списка
     COLOR_CHOICES = [('R', 'Red'), ('G', 'Green'), ('B', 'Blue')]
     color = ChoiceField(choices=COLOR_CHOICES, widget=RadioSelect)
-    # Использовать поле для даты с HTML5 виджетом
     event_date = DateField(widget=DateInput(attrs={'type': 'date', 'style': 'background-color:red'}))
 
 
 class StyledForm(forms.Form):
     name = CharField(
-        label="Имя",
+        label="Name",
         widget=TextInput(attrs={
             'class': 'form-control form-control-lg',
-            'placeholder': 'Введите ваше полное имя'
+            'placeholder': 'Enter your full name'
         })
     )
     message = CharField(
-        label="Сообщение",
+        label="Message",
         widget=Textarea(attrs={
             'class': 'form-control',
-            'rows': 5,  # Устанавливаем количество строк
-            'cols': 40  # Устанавливаем количество колонок
+            'rows': 5,
+            'cols': 40
         })
     )
     agree = BooleanField(
-        label="Согласен с условиями",
+        label="I agree to the terms",
         widget=CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
 
-# Bootstrap-friendly widgets for generic include rendering
 for _field in StyledForm.base_fields.values():
     css_class = _field.widget.attrs.get('class', '')
     if 'form-check-input' not in css_class:

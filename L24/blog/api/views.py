@@ -16,9 +16,6 @@ from .serializers import PostSerializer, ShortPostSerializer, CommentSerializer
 from ..models import Post, Author, Comment
 
 
-# CRUD - Create Read Update Delete
-# Retrieve List Create Update Destroy
-
 class CreateListPostAPIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -77,20 +74,16 @@ class ListCreatePostView(ListCreateAPIView):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """API эндпоинт, предоставляющий полный CRUD для постов."""
-    # queryset = Post.objects.order_by('-created_at')
     serializer_class = PostSerializer
     permission_classes = [IsAuthor]
-    # authentication_classes = []
     pagination_class = PostPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    # filterset_fields = ['author', 'published', 'created_at']
     filterset_class = PostFilter
     search_fields = [
         'title',
         'content',
-        'author__user__username',  # Точное совпадение username автора
-        '^author__user__email'  # Поиск email автора, начинающегося с ...
+        'author__user__username',
+        '^author__user__email'
     ]
     ordering_fields = ['created_at', 'published', 'author_id']
 
@@ -100,7 +93,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        elif self.action == 'create':
+        if self.action == 'create':
             return [IsAuthenticatedOrReadOnly()]
         return [IsAuthor()]
 
@@ -110,9 +103,11 @@ class PostViewSet(viewsets.ModelViewSet):
         return PostSerializer
 
     @action(detail=True, methods=['post'], url_path='publish', url_name='publish',
-            permission_classes=[IsAuthor], queryset=Post.objects.filter(published=False))
+            permission_classes=[IsAuthor])
     def publish(self, request, pk):
         post = self.get_object()
+        if post.published:
+            return Response({'message': 'Post is already published'}, status=400)
         post.published = True
         post.save(update_fields=['published'])
         return Response({'message': 'Post published successfully'}, status=200)
@@ -124,16 +119,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthor]
     pagination_class = CommentPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    # filterset_fields = ['post']
     filterset_class = CommentFilter
     search_fields = ['content', 'post__title', 'post__content']
     ordering_fields = ['created_at', 'post']
 
-
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        elif self.action == 'create':
+        if self.action == 'create':
             return [IsAuthenticatedOrReadOnly()]
         return [IsAuthor()]
 
+    def perform_create(self, serializer):
+        author, _ = Author.objects.get_or_create(user=self.request.user)
+        serializer.save(author=author)
