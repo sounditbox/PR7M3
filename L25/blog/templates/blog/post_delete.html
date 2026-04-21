@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Post | L13 Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="glass-card rounded-5 p-4 p-lg-5 text-center">
+            <span class="badge rounded-pill text-bg-danger-subtle text-danger-emphasis px-3 py-2 mb-3">Danger zone</span>
+            <h1 class="h2 fw-bold mb-3">Delete this post?</h1>
+            <p class="text-secondary mb-4">This action removes the post from the list. Not exactly subtle.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">Delete</button>
+                    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'blog:post_list' %}{% endif %}" class="btn btn-light btn-lg border">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
