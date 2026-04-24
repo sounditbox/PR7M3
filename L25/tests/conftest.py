@@ -47,3 +47,18 @@ def post(user):
         content='This is a test post.',
         author=Author.objects.get(user=user)
     )
+
+
+@pytest.fixture
+def post_data():
+    return {
+        'title': 'Test Post',
+        'content': 'This is a new data for post',
+    }
+
+
+@pytest.fixture
+def post_invalid_data():
+    return {
+        'title': 42,
+    }
