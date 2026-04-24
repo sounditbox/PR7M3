@@ -4,7 +4,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, \
+    IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -69,7 +70,7 @@ class ListCreatePostView(ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        author, _ = Author.objects.get_or_create(user=self.request.user)
+        author, _ = Author.objects.get(user=self.request.user)
         serializer.save(author=author)
 
 
@@ -94,8 +95,12 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
         if self.action == 'create':
-            return [IsAuthenticatedOrReadOnly()]
+            return [IsAuthenticated()]
         return [IsAuthor()]
+
+    def perform_create(self, serializer):
+        author = Author.objects.get(user=self.request.user)
+        serializer.save(author=author)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -131,5 +136,5 @@ class CommentViewSet(viewsets.ModelViewSet):
         return [IsAuthor()]
 
     def perform_create(self, serializer):
-        author, _ = Author.objects.get_or_create(user=self.request.user)
+        author = Author.objects.get_or_create(user=self.request.user)
         serializer.save(author=author)

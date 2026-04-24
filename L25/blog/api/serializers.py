@@ -52,7 +52,7 @@ class PostSerializer(serializers.ModelSerializer):
 class ShortPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'published', 'author', 'created_at']
+        fields = ['id', 'title', 'published', 'author', 'created_at']
         read_only_fields = ['created_at', 'updated_at', 'views', 'id']
 
     def to_representation(self, instance):
