@@ -30,11 +30,8 @@ def test_get_posts(db, api_client, post):
     assert response.data['data'][0]['title'] == post.title.upper()
 
 
-def test_create_post_success(db, auth_client, user):
-    auth_client.post(reverse('api:post-list'), data={
-        'title': 'Test Post',
-        'content': 'This is a test post.',
-    })
+def test_create_post_success(db, auth_client, user, post_data):
+    auth_client.post(reverse('api:post-list'), data=post_data)
     assert Post.objects.count() == 1
     assert Post.objects.first().title == 'Test Post'
     assert Post.objects.first().content == 'This is a test post.'
