@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
 
+    'graphene_django',
+
     'drf_spectacular',
 
     'django_filters',
@@ -157,4 +159,8 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+GRAPHENE = {
+    "SCHEMA": "config.schema.schema"
 }
