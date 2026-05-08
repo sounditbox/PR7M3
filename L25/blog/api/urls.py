@@ -1,5 +1,7 @@
 # blog/urls.py
 from django.urls import path, include
+from drf_spectacular.views import SpectacularRedocView, SpectacularAPIView, \
+    SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -12,22 +14,32 @@ router = DefaultRouter()
 router.register('posts', views.PostViewSet, basename='post')
 router.register('comments', views.CommentViewSet, basename='comment')
 
-
-
 urlpatterns = [
-    path('posts/', views.CreateListPostAPIView.as_view(), name='create_list_post'),
-    path('posts/<int:pk>/', views.RetrieveDeleteUpdatePostAPIView.as_view(), name='retrieve_delete_update_post'),
+    path('posts/', views.CreateListPostAPIView.as_view(),
+         name='create_list_post'),
+    path('posts/<int:pk>/', views.RetrieveDeleteUpdatePostAPIView.as_view(),
+         name='retrieve_delete_update_post'),
 
-    path('generics/posts/', views.ListCreatePostView.as_view(), name='list_create_post'),
-    path('generics/posts/<int:pk>/', views.RetrieveUpdateDestroyPostView.as_view(),
+    path('generics/posts/', views.ListCreatePostView.as_view(),
+         name='list_create_post'),
+    path('generics/posts/<int:pk>/',
+         views.RetrieveUpdateDestroyPostView.as_view(),
          name='retrieve_update_destroy_post'),
 
     path('viewsets/', include(router.urls)),
 
-
     path('token-auth/', obtain_auth_token),  # TokenAuth
 
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # JWTAuth
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # JWTAuth
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    path('schema/swagger-ui/',
+         SpectacularSwaggerView.as_view(url_name='api:schema'), name='swagger'),
+
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name='api:schema'),
+         name='redoc'),
 
 ]

@@ -12,6 +12,7 @@ dependencies = [
     "django-unfold>=0.81.0",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.29.0",
     "ipython>=9.10.0",
     "pytest>=9.0.3",
     "pytest-cov>=7.1.0",

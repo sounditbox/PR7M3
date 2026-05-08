@@ -51,6 +51,7 @@ def post(user):
 
 @pytest.fixture
 def post_data():
+
     return {
         'title': 'Test Post',
         'content': 'This is a new data for post',
@@ -59,6 +60,7 @@ def post_data():
 
 @pytest.fixture
 def post_invalid_data():
+
     return {
         'title': 42,
     }
