@@ -25,7 +25,9 @@ logger = logging.getLogger(__name__)
 
 class PostListView(PermissionRequiredMixin, ListView):
     model = Post
-    queryset = Post.objects.filter(published=True).order_by('-created_at').annotate(comments_count=Count('comments'))
+    queryset = (Post.objects.filter(published=True)
+                .prefetch_related('comments', 'author', 'tags')
+                .order_by('-created_at').annotate(comments_count=Count('comments')))
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     paginate_by = 10

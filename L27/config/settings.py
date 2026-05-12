@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
+    "debug_toolbar",
+    #'graphiql_debug_toolbar',
     'corsheaders',
 
     'rest_framework',
@@ -48,6 +50,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    #'graphiql_debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -164,3 +168,9 @@ SIMPLE_JWT = {
 GRAPHENE = {
     "SCHEMA": "config.schema.schema"
 }
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
