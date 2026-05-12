@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Simple View | L13 Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="glass-card rounded-5 p-4 p-lg-5">
+            <h1 class="h2 fw-bold mb-4">Simple view</h1>
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="message" class="form-label fw-semibold">Message</label>
+                    <input id="message" type="text" name="message" placeholder="Message" class="form-control form-control-lg">
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+            <div class="card border-0 bg-light-subtle rounded-4">
+                <div class="card-body">
+                    <p class="mb-2"><strong>Message:</strong> {{ message|default:"—" }}</p>
+                    <p class="mb-0"><strong>Method:</strong> {{ method|default:"—" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
